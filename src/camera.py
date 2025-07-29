@@ -1,19 +1,17 @@
-# 카메라(웹캠) 프레임 읽기 (video_cam.py)
+# 관심영역 표시 (roi.py)
 
 import cv2
+import numpy as np
 
-cap = cv2.VideoCapture(0)               # 0번 카메라 장치 연결 ---①
-if cap.isOpened():                      # 캡쳐 객체 연결 확인
-    while True:
-        ret, img = cap.read()           # 다음 프레임 읽기
-        if ret:
-            cv2.imshow('camera', img)   # 다음 프레임 이미지 표시
-            if cv2.waitKey(1) != -1:    # 1ms 동안 키 입력 대기 ---②
-                break                   # 아무 키라도 입력이 있으면 중지
-        else:
-            print('no frame')
-            break
-else:
-    print("can't open camera.")
-cap.release()                           # 자원 반납
+img = cv2.imread('../img/sunset.jpg')
+
+x=320; y=150; w=50; h=50        # roi 좌표
+roi = img[y:y+h, x:x+w]         # roi 지정        ---①
+
+print(roi.shape)                # roi shape, (50,50,3)
+cv2.rectangle(roi, (0,0), (h-1, w-1), (0,255,0)) # roi 전체에 사각형 그리기 ---②
+cv2.imshow("img", img)
+
+key = cv2.waitKey(0)
+print(key)
 cv2.destroyAllWindows()

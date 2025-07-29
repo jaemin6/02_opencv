@@ -1,145 +1,154 @@
-# OpenCV 개념 정리
+# OpenCV 이미지 처리 개념 총정리 (예제 + 개념 + 수도코드)
 
-## 필수 라이브 러리
+## 목차
+1. 히스토그램 (Histogram)
+
+2. 스레숄딩 (Thresholding)
+
+3. 관심영역 (ROI: Region of Interest)
+
+4. 역투영 (Back Projection)
+
+5. 기본 라이브러리 설명
+
+## 1. 히스토그램 (Histogram)
+
+### ✅ 개념
+히스토그램은 이미지의 밝기 또는 색상 값이 얼마나 분포되어 있는지 시각적으로 나타낸 그래프입니다.
+이미지 처리에서 히스토그램은 색 분포, 명암도 분포를 파악하거나 대비 향상 등에 사용됩니다.
+
+### ✅ 대표 함수
 ```
-import cv2                  # OpenCV - 이미지 처리 기능 제공
-import numpy as np         # Numpy - 배열, 프린서 계산을 위해 필요
-import matplotlib.pyplot as plt  # Matplotlib - 특정 데이터를 구현적으로 그리는 용도
+cv2.calcHist(images, channels, mask, histSize, ranges)
 ```
 
-### 1. 히스토그램(Histogram)
+<img width="576" height="310" alt="cv2" src="https://github.com/user-attachments/assets/59303cfa-f8b1-41af-a41e-ed6a2aa06e56" />
 
-#### 개발 목적
-1. 이미지의 값 범위 및 범위의 평화, 메인 값의 범위를 해석
 
-2. 메뉴 보이는 값들이 바로 어떻게 반영되는지
-
-#### 사용 코드
+### ✅ 예제 코드
 ```
-img = cv2.imread('img.jpg', cv2.IMREAD_GRAYSCALE)   # 회전이 없는 구분 이미\uc9c으로 로드
+import cv2
+import matplotlib.pyplot as plt
+
+img = cv2.imread('lenna.jpg', cv2.IMREAD_GRAYSCALE)
 hist = cv2.calcHist([img], [0], None, [256], [0,256])
 plt.plot(hist)
+plt.title('Histogram')
 plt.show()
 ```
 
-#### HSV 모델의 Histogram
+### ✅ 수도코드
 ```
-hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-hist = cv2.calcHist([hsv], [0,1], None, [180,256], [0,180,0,256])
-```
-
-### 2. 스레싱홀딩 (Thresholding)
-
-#### 개발 목적
-복수로 방면을 나누는 것이 또는 가장 높은 값, 낮은 값으로 구분
-
-#### 가정
-```
-_, binary = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
-cv2.imshow("binary", binary)
-```
-127 = 기준값
-
-255 = 차례 이상 일감 값의 출력 값
-
-THRESH_BINARY : 낮은 값은 0, 높은 값은 255
-
-#### 자동 사용 (Otsu)
-```
-_, th_otsu = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+1. 이미지를 불러온다
+2. 흑백으로 변환한다 (필요시)
+3. 히스토그램 계산 함수 호출
+4. matplotlib로 시각화
 ```
 
-### 3. 이미지 내 관심 영역 선택 (ROI: Region of Interest)
+## 2. 스레숄딩 (Thresholding)
 
-#### 개발 목적
-이미지의 특정 영역을 개발자가 선택하여 처리
+### ✅ 개념
+임계값을 기준으로 이미지를 이진화합니다. 픽셀 값이 임계값보다 크면 흰색(255), 작으면 검정색(0)으로 설정합니다.
 
-#### 그래프
+### ✅ 대표 함수
 ```
-(x,y,w,h) = cv2.selectROI("win_name", img, False)   # 마우스로 선택
-roi = img[y:y+h, x:x+w]    # 이미지의 그 영역을 자동 표시
-```
-
-#### HSV 변환 + 히스토그램 생성
-```
-hsv_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
-hist_roi = cv2.calcHist([hsv_roi], [0,1], None, [180,256], [0,180,0,256])
+retval, dst = cv2.threshold(src, thresh, maxval, type)
 ```
 
-### 4. 역투영 (Back Projection)
+<img width="464" height="226" alt="cv3" src="https://github.com/user-attachments/assets/d6cc8639-ae43-4966-85cf-eecfde9de8cd" />
 
-#### 개발 목적
-1. 선택한 개체의 연결 형태를 검색하기 위해
-
-2. 전체 이미지에서 그 도메인스를 찾는 기능
-
-#### 직접 구현 함수 Manual
+### ✅ 예제 코드
 ```
-hist_img = cv2.calcHist([hsv_img], [0,1], None, [180,256], [0,180,0,256])
-hist_rate = hist_roi / (hist_img + 1)
-
-h,s,v = cv2.split(hsv_img)
-bp = hist_rate[h.ravel(), s.ravel()]
-bp = np.minimum(bp, 1)
-bp = bp.reshape(hsv_img.shape[:2])
-cv2.normalize(bp, bp, 0, 255, cv2.NORM_MINMAX)
-bp = bp.astype(np.uint8)
-```
-
-#### OpenCV 기능 이용
-```
-bp = cv2.calcBackProject([hsv_img], [0, 1], hist_roi, [0,180,0,256], 1)
-```
-
-#### 결과 마스킹 및 출력
-```
-disc = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5,5))
-cv2.filter2D(bp, -1, disc, bp)
-_, mask = cv2.threshold(bp, 1, 255, cv2.THRESH_BINARY)
-result = cv2.bitwise_and(img, img, mask=mask)
-cv2.imshow("result", result)
-```
-
-
-### 5. 기타 개념 정리
-
-#### 요소 생성 (Structuring Element)
-```
-cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5,5))
-```
-전환, 해제 같은 곳에 사용
-
-#### 필터링 함수
-```
-cv2.filter2D(src, ddepth, kernel, dst)
-```
-시계적 논리와 같은 필터 결과 출력
-
-#### 비트 연산
-```
-cv2.bitwise_and(img1, img2, mask=mask)
-```
-영역적 건포를 간주
-
-#### Threshold 
-```
-_, mask = cv2.threshold(bp, 1, 255, cv2.THRESH_BINARY)
-```
-bp의 값이 1 이상이면 255, 그 이하면 0
-
-
-## 종료
-```
-cv2.imshow("win_name", draw)
-cv2.waitKey()
+img = cv2.imread('lenna.jpg', cv2.IMREAD_GRAYSCALE)
+ret, th = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
+cv2.imshow('Threshold', th)
+cv2.waitKey(0)
 cv2.destroyAllWindows()
 ```
+### ✅ 수도코드
+```
+1. 이미지를 불러온다
+2. 그레이스케일로 변환한다
+3. cv2.threshold()로 이진화 처리
+4. 결과를 출력한다
+```
+## 3. 관심영역 (ROI: Region of Interest)
 
-### 목적
-출력 함수의 반복 및 종료
+### ✅ 개념
+이미지에서 사용자가 관심 있는 부분만 잘라서 따로 처리하는 기술입니다. 객체 추적, 필터 적용 등에 사용됩니다.
 
+### ✅ ROI 설정 함수
+```
+x, y, w, h = cv2.selectROI(window_name, img, fromCenter=False)
+roi = img[y:y+h, x:x+w]
+```
+### ✅ 예제 코드
+```
+img = cv2.imread('lenna.jpg')
+roi = img[100:200, 100:200]
+cv2.imshow('ROI', roi)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+```
+### ✅ 수도코드
+```
+1. 이미지 불러오기
+2. ROI 영역 좌표 설정
+3. 자른 부분만 따로 변수로 저장
+4. 해당 영역만 출력하거나 처리
+```
+## 4. 역투영 (Back Projection)
 
+### ✅ 개념
+어떤 특정 물체의 색상 히스토그램을 기반으로 전체 이미지에서 해당 색상이 있는 부분을 찾아내는 기술입니다.
+대표적으로 객체 추적 등에 활용됩니다.
 
+### ✅ 주요 사용 함수
+```
+cv2.calcBackProject(images, channels, hist, ranges, scale)
+```
+
+### ✅ 예제 코드
+```
+# ROI 선택 -> HSV -> 히스토그램 계산 -> 전체 이미지에 역투영 적용
+img = cv2.imread('target.jpg')
+hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+hist = cv2.calcHist([hsv_roi], [0, 1], None, [180, 256], [0, 180, 0, 256])
+bp = cv2.calcBackProject([hsv], [0,1], hist, [0,180,0,256], 1)
+```
+
+### ✅ 수도코드
+```
+1. 원본 이미지 불러오기
+2. 추적할 대상 ROI 선택 -> HSV 변환
+3. ROI 히스토그램 계산
+4. 전체 이미지 HSV에서 calcBackProject() 실행
+5. 결과로 나온 역투영 이미지 활용 (마스킹 등)
+```
+
+## 5. 기본 라이브러리 설명
+
+### 1. 📦 OpenCV (cv2)
+1. 컴퓨터 비전 라이브러리
+
+2. 이미지 처리, 영상 인식, 객체 추적 등 기능 제공
+
+### 2. 📦 NumPy (np)
+1. 수치 계산용 라이브러리
+
+2. 배열 처리, 이미지 수치 연산 등에 사용
+
+### 3. 📦 Matplotlib (matplotlib.pyplot)
+1. 데이터 시각화 라이브러리
+
+2. 히스토그램, 이미지 출력 등을 위한 플롯 기능 제공
+
+### 4. 📁 추천 예제 이미지 목록
+1. lenna.jpg → 고전적인 테스트 이미지
+
+2. sunset.jpg → 다양한 컬러가 섞인 장면 (히스토그램 연습에 좋음)
+
+3. pump_horse.jpg → 역투영 예제에 적합
 
 
 

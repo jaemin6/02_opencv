@@ -9,7 +9,7 @@ bgr = cv2.imread('../img/like_lenna.png', cv2.IMREAD_COLOR)
 bgra = cv2.imread('../img/like_lenna.png', cv2.IMREAD_UNCHANGED)
 
 # shape
-print("default", img.shape, "color", bgr.shap, "unchanged", bgra.shape)
+print("default", img.shape, "color", bgr.shape, "unchanged", bgra.shape)
 
 cv2.imshow('img', img)
 cv2.imshow('bgr', bgr)

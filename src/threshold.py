@@ -9,7 +9,7 @@ thresh_np = np.zeros_like(img) # 원본과 동일한 크기의 0으로 채운 �
 thresh_np[ img > 127 ] = 255   # 127보다 큰 값만 255로 변경 
 
 # OpenCV API로 바이너리 이미지 만들기
-cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
+ret, thresh_cv = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY) 
 print(ret) # 127.0, 바이너리 이미지에 사용된 문턱 값 반환
 
 # matploit로 출력

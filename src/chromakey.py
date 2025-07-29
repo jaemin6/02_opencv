@@ -5,8 +5,11 @@ import numpy as np
 import matplotlib.pylab as plt
 
 #--① 크로마키 배경 영상과 합성할 배경 영상 읽기
-img1 = cv2.imread('../img/kia.jpg')
-img2 = cv2.imread('../img/pshcho.jpg')
+img1 = cv2.imread('../img/man_chromakey.jpg')
+img2 = cv2.imread('../img/magma.jpg')
+# 이미지1 크기에 맞게 이미지2를 강제로 맞춤
+img2 = cv2.resize(img2, (img1.shape[1], img1.shape[0]))
+
 
 #--② ROI 선택을 위한 좌표 계산
 height1, width1 = img1.shape[:2]
@@ -39,10 +42,6 @@ fg = cv2.bitwise_and(img1, img1, mask=mask_inv)
 bg = cv2.bitwise_and(roi, roi, mask=mask)
 img2[y:h, x:w] = fg + bg
 
-
-#--⑦ 결과 출력 (이미지를 축소해서 보기 좋게 만들기)
-img1_small = cv2.resize(img1, (0, 0), fx=0.5, fy=0.5)
-img2_small = cv2.resize(img2, (0, 0), fx=0.5, fy=0.5)
 
 #--⑦ 결과 출력
 cv2.imshow('chromakey', img1)

@@ -180,7 +180,61 @@ masked = cv2.bitwise_and(img, img, mask=mask)
 3. bitwise_and로 마스크 적용
 ```
 
-## 📌 7. 자주 쓰이는 OpenCV 기본 함수 요약
+## 🛑 7. 이미지 창 종료 및 프로그램 마무리
+
+### ✅ 개념
+OpenCV로 이미지(cv2.imshow)를 화면에 띄웠다면, 항상 사용자 입력을 받아 종료하는 루틴이 있어야 함 
+ 그렇지 않으면 프로그램이 너무 빨리 종료되거나, 창이 그대로 남아버릴 수 있음
+
+### ✅ 필수 함수 정리
+| 함수                              | 설명                            |
+| ------------------------------- | ----------------------------- |
+| `cv2.waitKey(ms)`               | 키보드 입력을 기다립니다. `ms=0`이면 무한 대기 |
+| `cv2.destroyAllWindows()`       | 열린 모든 OpenCV 창을 닫습니다          |
+| `cv2.destroyWindow(windowName)` | 특정 창만 닫고 싶을 때 사용              |
+
+
+OpenCV에서는 cv2.waitKey() 와 cv2.destroyAllWindows()를 조합해서 종료 처리를 함
+
+### ✅ 종료 루틴 예제 코드 (기본형)
+```
+import cv2
+
+# 이미지 보여주기
+img = cv2.imread('sample.jpg')
+cv2.imshow('Sample', img)
+
+# 키보드 입력 대기
+cv2.waitKey(0)
+
+# 창 닫기
+cv2.destroyAllWindows()
+```
+
+### ✅ 종료 루틴 예제 코드 (ESC 키나 'q'로 종료)
+```
+import cv2
+
+img = cv2.imread('sample.jpg')
+cv2.imshow('Sample', img)
+
+while True:
+    key = cv2.waitKey(1) & 0xFF
+    if key == 27 or key == ord('q'):  # ESC 또는 q 키
+        break
+
+cv2.destroyAllWindows()
+```
+
+### ✅ 수도코드
+```
+1. 이미지를 imshow로 화면에 띄운다
+2. 사용자의 키 입력을 기다린다 (무한 혹은 특정 시간)
+3. 특정 키를 누르면 break
+4. 모든 창을 닫는다
+```
+
+## 📌 8. 자주 쓰이는 OpenCV 기본 함수 요약
 
 <img width="586" height="484" alt="화면 캡처 2025-07-29 172019" src="https://github.com/user-attachments/assets/78d4b347-c124-49ad-8ee9-4a53e8eae4f2" />
 

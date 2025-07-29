@@ -145,10 +145,13 @@ bp = cv2.calcBackProject([hsv], [0,1], hist, [0,180,0,256], 1)
 
 ### 4. 📁 추천 예제 이미지 목록
 1. lenna.jpg → 고전적인 테스트 이미지
+<img width="1024" height="1024" alt="like_lenna" src="https://github.com/user-attachments/assets/1393019e-9653-49cf-a0ba-b29dd571750b" />
 
 2. sunset.jpg → 다양한 컬러가 섞인 장면 (히스토그램 연습에 좋음)
+![sunset](https://github.com/user-attachments/assets/79bb3ee6-58ac-45ea-aeb3-ef65a597432e)
 
 3. pump_horse.jpg → 역투영 예제에 적합
+<img width="1280" height="351" alt="pump_horse" src="https://github.com/user-attachments/assets/3b856d08-0f2a-4c76-99b6-e62016c66d4f" />
 
 
 
